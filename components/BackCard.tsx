@@ -1,51 +1,103 @@
 "use client";
 import styles from "@/styles/MainCard.module.css";
-import { FoodMenu } from "@/utils/Interface";
-import {
-  ChangeEvent,
-  FormEvent,
-  FormEventHandler,
-  useEffect,
-  useState,
-} from "react";
+import { FoodOrdered } from "@/utils/Interface";
+import { ChangeEvent, useEffect, useState } from "react";
 import Image from "next/image";
 import mpesaLogo from "@/public/Mpesa Logo.png";
 
 interface BackCardProps {
-  foodOrdered: FoodMenu[] | null;
+  foodOrdered: FoodOrdered[] | null;
+  setCardSide: (param: string) => void;
+  setCurrentStep: (param: number) => void;
 }
 
-const BackCard = ({ foodOrdered }: BackCardProps) => {
-  const [order, setOrder] = useState<FoodMenu[] | null>(null);
+const BackCard = ({
+  foodOrdered,
+  setCardSide,
+  setCurrentStep,
+}: BackCardProps) => {
+  const [order, setOrder] = useState<FoodOrdered[] | null>(null);
   const [input, setInput] = useState({ contact: "", regNo: "" });
   const [totalBill, setTotalBill] = useState(0);
   const [totalVat, setTotalVat] = useState(0);
+  const [confirmButton, setConfirmButton] = useState<HTMLButtonElement | null>(
+    null
+  );
 
   useEffect(() => {
-    console.log(foodOrdered);
     setOrder(foodOrdered);
 
     let bill: number = 0;
     let vat: number = 0;
-    foodOrdered?.forEach(
-      (foodObj) => ((bill += foodObj.price), (vat += foodObj.vat))
-    );
+    foodOrdered?.forEach((foodObj) => (bill += foodObj.price));
 
     setTotalBill(bill);
-    setTotalVat(vat);
+    setTotalVat(0);
+    const btnConfirm = document.getElementById(
+      "navbutton-back-confirm"
+    ) as HTMLButtonElement;
+    btnConfirm && (btnConfirm.hidden = true);
+    setConfirmButton(btnConfirm);
   }, [foodOrdered]);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-  };
+  useEffect(() => {
+    const handleSubmitNewOrder = (event: MouseEvent) => {
+      setTimeout(() => {
+        setCardSide("back");
+        setCurrentStep(4);
 
+        const frontCardDiv = document.querySelector(`.${styles.card}`);
+        frontCardDiv?.classList.toggle(`${styles.rotateFront}`);
+      }, 5000);
+    };
+    confirmButton?.addEventListener("click", handleSubmitNewOrder);
+
+    return () => {
+      confirmButton?.removeEventListener("click", handleSubmitNewOrder);
+    };
+  }, [confirmButton, setCardSide, setCurrentStep]);
+
+  const validateContact = (contact: string) => {
+    if (contact.startsWith("+254")) {
+      if (contact.substring(4).length === 9) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if (contact.startsWith("254")) {
+      if (contact.substring(3).length === 9) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if (contact.startsWith("07") || contact.startsWith("01")) {
+      if (contact.substring(2).length === 8) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  };
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
 
-    if (name == "contact" && isNaN(+value)) {
+    if (name === "contact" && isNaN(+value) && value !== "+") {
       return;
     }
-    setInput({ ...input, [name]: value });
+
+    if (name === "contact") {
+      setInput({ ...input, [name]: value });
+
+      const showConfirmButton = validateContact(value);
+
+      if (showConfirmButton) {
+        confirmButton && (confirmButton.hidden = false);
+      } else {
+        confirmButton && (confirmButton.hidden = true);
+      }
+    } else {
+      setInput({ ...input, [name]: value });
+    }
   };
 
   return (
@@ -60,20 +112,19 @@ const BackCard = ({ foodOrdered }: BackCardProps) => {
         <div className="flex flex-col gap-2 overflow-x-hidden my-3 px-5 justify-center w-full h-full">
           {order?.map((food, index) => (
             <div
-              key={food.id}
+              key={food.foodName}
               className="flex flex-row justify-between container"
             >
-              <span className="basis-2/3">
-                {index + 1}. {food.name}
+              <span className="flex flex-row gap-3">
+                <span>{food.qty}x</span>
+                <span>{food.foodName}</span>
               </span>
-              <span className="grow">
-                Ksh. {food.price} <span>(VAT: {food.vat})</span>
-              </span>
+              <span className="flex flex-row">Ksh. {food.price}</span>
             </div>
           ))}
         </div>
       </div>
-      <div className=" basis-1/2 p-3 flex flex-col gap-12 rounded-tl-3xl rounded-br-3xl ">
+      <div className=" basis-1/2 p-3 flex flex-col justify-between rounded-tl-3xl rounded-br-3xl ">
         <div className="flex flex-col items-center">
           <span className="text-[20px] italic">
             Total Amount: Ksh. {totalBill + totalVat}
@@ -89,18 +140,17 @@ const BackCard = ({ foodOrdered }: BackCardProps) => {
             height={40}
           />
           <span>560671</span>
+          <span>VAT per food ordered: 16%</span>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="w-full h-full flex flex-col gap-5"
-        >
+        <form className="w-full h-full flex flex-col gap-5">
           <label className="flex flex-row justify-between">
             <span>Phone Number: </span>
             <input
               type="text"
               name="contact"
-              className="rounded-lg h-[29px] shadow-xl outline outline-yellow-200"
+              autoComplete="off"
+              className="rounded-lg h-[29px] w-[60%] shadow-xl outline outline-yellow-200 p-1 font-extrabold tracking-wider"
               value={input.contact}
               onChange={handleInputChange}
             />
@@ -110,7 +160,8 @@ const BackCard = ({ foodOrdered }: BackCardProps) => {
             <input
               type="text"
               name="regNo"
-              className="rounded-md h-[29px] shadow-xl outline outline-yellow-200"
+              autoComplete="off"
+              className="rounded-md h-[29px] w-[60%] shadow-xl outline outline-yellow-200 p-1 font-extrabold tracking-wider"
               value={input.regNo}
               onChange={handleInputChange}
             />

@@ -10,6 +10,5 @@ export const GET = ():NextResponse => {
         { id: 5, name: "Food5", price: 5, vat: 5 },
     ];
 
-    console.log(foodMenuList);
     return NextResponse.json(foodMenuList);
 }

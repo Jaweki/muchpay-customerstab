@@ -1,15 +1,17 @@
 "use client";
 
 import styles from "@/styles/MainCard.module.css";
-import { FoodMenu } from "@/utils/Interface";
+import { FoodMenu, FoodOrdered } from "@/utils/Interface";
 import { getFoodMenu } from "@/utils";
-import FrontCardButton from "./FrontCardButton";
 import { useEffect, useState } from "react";
+import QtySelection from "./QtySelection";
 
 const FrontCard = ({
+  foodOrdered,
   setFoodOrdered,
 }: {
-  setFoodOrdered: (prop: FoodMenu[] | null) => void;
+  foodOrdered: FoodOrdered[] | null;
+  setFoodOrdered: (prop: FoodOrdered[] | null) => void;
 }) => {
   const [foodMenu, setFoodMenu] = useState<FoodMenu[] | null>(null);
 
@@ -21,6 +23,13 @@ const FrontCard = ({
     }
 
     setMenu();
+  }, []);
+
+  useEffect(() => {
+    const frontButton = document.getElementById(
+      "navbutton-front"
+    ) as HTMLButtonElement;
+    frontButton.hidden = true;
   }, []);
 
   return (
@@ -35,7 +44,6 @@ const FrontCard = ({
 
         <div className="m-2 border border-solid border-black h-16 w-24 bg-blue-950"></div>
         <div className="m-2 border border-solid border-black h-16 w-24 bg-blue-950"></div>
-        <FrontCardButton foodMenu={foodMenu} setFoodOrdered={setFoodOrdered} />
       </div>
 
       <div id="foodMenu" className="basis-3/4 flex flex-col">
@@ -46,19 +54,48 @@ const FrontCard = ({
               key={`${food.id}-${food.name}`}
             >
               <span className="basis-2/4 font-bold text-xl">{food.name}</span>
-              <div className="flex justify-between grow">
-                <span>Ksh. {food.price}</span>
-                <span>VAT: {food.vat}</span>
+              <div className="flex justify-between grow flex-row items-center gap-1">
+                <QtySelection foodId={`${food.id}`} price={food.price} />
+                <span className="flex flex-row">
+                  Ksh. <span id={`price-${food.id}`}>{food.price}</span>
+                </span>
+
                 <input
                   type="checkbox"
-                  id={food.name}
+                  id={`checkbox-${food.id}`}
                   className="hover:cursor-pointer"
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      const frontButton = document.getElementById(
+                        "navbutton-front"
+                      ) as HTMLButtonElement;
+                      frontButton && (frontButton.hidden = false);
+                      const qtyElement = document.getElementById(
+                        `selection-${food.id}`
+                      ) as HTMLSelectElement;
+                      const newOrder: FoodOrdered = {
+                        qty: +qtyElement.value,
+                        foodName: food.name,
+                        price: food.price * +qtyElement.value,
+                      };
+                      foodOrdered
+                        ? setFoodOrdered([...foodOrdered, newOrder])
+                        : setFoodOrdered([newOrder]);
+                    } else if (!e.target.checked) {
+                      const remainingOrder = foodOrdered?.filter(
+                        (order) => order.foodName !== food.name
+                      );
+                      remainingOrder
+                        ? setFoodOrdered(remainingOrder)
+                        : setFoodOrdered(null);
+                    }
+                  }}
                 />
               </div>
             </div>
           ))}
         </div>
-        <span>{foodMenu?.length} Meals Avaliable On Menu</span>
+        <span>{foodMenu?.length ?? 0} Meals Avaliable On Menu</span>
       </div>
     </div>
   );

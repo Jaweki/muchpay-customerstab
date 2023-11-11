@@ -60,8 +60,29 @@
     perspective: 1000px;
 } 
 
+.frontButton {
+    transform: rotateY(0deg) translateZ(70px);
+}
+
+.backButton { 
+    transform: rotateY(180deg) translateZ(70px);
+}
+
 
 .rotateFront {
     transform: rotateY(180deg) rotateX(360deg);
     transform-style: preserve-3d;
+}
+
+.animatePending {
+    animation: bounce 2s infinite alternate;
+}
+
+@keyframes bounce {
+    0% {
+        transform: scale(0.7);
+    }
+    100% {
+        transform: scale(1);
+    }
 }

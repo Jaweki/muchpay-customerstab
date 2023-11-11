@@ -15,3 +15,8 @@ export interface Checkbox {
 export interface CheckboxesProps {
     checkbox: Checkbox[];
 }
+export interface FoodOrdered {
+    qty: number;
+    foodName: string;
+    price: number;
+  }
