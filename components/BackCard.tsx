@@ -1,20 +1,23 @@
 "use client";
 import styles from "@/styles/MainCard.module.css";
-import { FoodOrdered } from "@/utils/Interface";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ConfirmDataProps, FoodOrdered } from "@/utils/Interface";
+import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import mpesaLogo from "@/public/Mpesa Logo.png";
+import axios from "axios";
 
 interface BackCardProps {
   foodOrdered: FoodOrdered[] | null;
   setCardSide: (param: string) => void;
   setCurrentStep: (param: number) => void;
+  setConfirmData: (param: ConfirmDataProps) => void;
 }
 
 const BackCard = ({
   foodOrdered,
   setCardSide,
   setCurrentStep,
+  setConfirmData,
 }: BackCardProps) => {
   const [order, setOrder] = useState<FoodOrdered[] | null>(null);
   const [input, setInput] = useState({ contact: "", regNo: "" });
@@ -28,7 +31,6 @@ const BackCard = ({
     setOrder(foodOrdered);
 
     let bill: number = 0;
-    let vat: number = 0;
     foodOrdered?.forEach((foodObj) => (bill += foodObj.price));
 
     setTotalBill(bill);
@@ -40,22 +42,58 @@ const BackCard = ({
     setConfirmButton(btnConfirm);
   }, [foodOrdered]);
 
-  useEffect(() => {
-    const handleSubmitNewOrder = (event: MouseEvent) => {
-      setTimeout(() => {
+  const sendOrderToBackend = useCallback(async () => {
+    try {
+      const url = "/api/lipa";
+      const payload = {
+        order,
+        customer: input,
+      };
+      const response = await axios.post(url, payload);
+
+      const data = await response.data;
+
+      if (response.status === 201 && data) {
+        setConfirmData({
+          receipt_no: data.receipt_no,
+          mpesa_refNo: data.mpesa_refNo,
+          message: data.message,
+        });
         setCardSide("back");
         setCurrentStep(4);
 
         const frontCardDiv = document.querySelector(`.${styles.card}`);
         frontCardDiv?.classList.toggle(`${styles.rotateFront}`);
-      }, 5000);
-    };
+      } else {
+        setConfirmData({
+          message: data.message,
+        });
+        setCardSide("back");
+        setCurrentStep(4);
+
+        const frontCardDiv = document.querySelector(`.${styles.card}`);
+        frontCardDiv?.classList.toggle(`${styles.rotateFront}`);
+      }
+    } catch (error) {
+      alert("System not Connected to internet!");
+      window.location.assign("/");
+    }
+  }, [input, order, setCardSide, setConfirmData, setCurrentStep]);
+
+  const handleSubmitNewOrder = useCallback(
+    (event: MouseEvent) => {
+      sendOrderToBackend();
+    },
+    [sendOrderToBackend]
+  );
+
+  useEffect(() => {
     confirmButton?.addEventListener("click", handleSubmitNewOrder);
 
     return () => {
       confirmButton?.removeEventListener("click", handleSubmitNewOrder);
     };
-  }, [confirmButton, setCardSide, setCurrentStep]);
+  }, [confirmButton, handleSubmitNewOrder]);
 
   const validateContact = (contact: string) => {
     if (contact.startsWith("+254")) {
@@ -110,7 +148,7 @@ const BackCard = ({
         </span>
 
         <div className="flex flex-col gap-2 overflow-x-hidden my-3 px-5 justify-center w-full h-full">
-          {order?.map((food, index) => (
+          {order?.map((food) => (
             <div
               key={food.foodName}
               className="flex flex-row justify-between container"

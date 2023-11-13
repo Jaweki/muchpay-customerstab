@@ -1,7 +1,12 @@
 import styles from "@/styles/MainCard.module.css";
+import { ConfirmDataProps } from "@/utils/Interface";
 import { useEffect, useState } from "react";
 
-const ConfirmationResult = () => {
+const ConfirmationResult = ({
+  confirmData,
+}: {
+  confirmData: ConfirmDataProps | null;
+}) => {
   const [okButton, setOkButton] = useState<HTMLButtonElement | null>(null);
 
   useEffect(() => {

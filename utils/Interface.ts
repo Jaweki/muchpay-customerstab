@@ -20,3 +20,17 @@ export interface FoodOrdered {
     foodName: string;
     price: number;
   }
+
+  export interface ConfirmDataProps {
+    message: string;
+    mpesa_refNo?: string;
+    receipt_no?: string;
+  }
+
+  export type OrderData = {
+    order: FoodOrdered[],
+    customer: {
+        contact: string;
+        regNo: string;
+    }
+  }

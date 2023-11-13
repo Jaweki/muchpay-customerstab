@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { FrontCard, BackCard } from ".";
 import styles from "@/styles/MainCard.module.css";
-import { FoodOrdered } from "@/utils/Interface";
+import { ConfirmDataProps, FoodOrdered } from "@/utils/Interface";
 import NavButton from "./NavButton";
 import ConfirmPending from "./ConfirmPending";
 import ConfirmationResult from "./ConfirmationResult";
@@ -11,6 +11,7 @@ const MainCard = () => {
   const [foodOrdered, setFoodOrdered] = useState<FoodOrdered[] | null>(null);
   const [cardSide, setCardSide] = useState("front");
   const [currentStep, setCurrentStep] = useState(1);
+  const [confirmData, setConfirmData] = useState<ConfirmDataProps | null>(null);
 
   useEffect(() => {
     const frontButton = document.getElementById(
@@ -37,6 +38,7 @@ const MainCard = () => {
           foodOrdered={foodOrdered}
           setCardSide={setCardSide}
           setCurrentStep={setCurrentStep}
+          setConfirmData={setConfirmData}
         />
       )}
       {cardSide === "back" && currentStep === 2 && (
@@ -61,11 +63,13 @@ const MainCard = () => {
         />
       )}
       {cardSide === "front" && currentStep === 3 && <ConfirmPending />}
-      {cardSide === "back" && currentStep === 4 && <ConfirmationResult />}
+      {cardSide === "back" && currentStep === 4 && (
+        <ConfirmationResult confirmData={confirmData} />
+      )}
       {cardSide === "back" && currentStep === 4 && (
         <NavButton
           additionalStyles={`-bottom-2 left-0 bg-yellow-400 ${styles.backButton}`}
-          textContent="Confirm"
+          textContent="Finish"
           cardSide={cardSide}
           role="OK"
           setCardSide={setCardSide}
