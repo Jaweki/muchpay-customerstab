@@ -58,7 +58,7 @@ function timeStamp() {
 }
 
 function encodePassword(BSshortcode: number, passKey: string, timeStamp: string) {
-   return Buffer.from(`${BSshortcode}${passKey}${timeStamp}`, "base64")
+   return Buffer.from(`${BSshortcode}${passKey}${timeStamp}`).toString('base64');
 }
 
 async function gen_access_token() {
@@ -101,7 +101,7 @@ async function requestMpesaPayment(BSshortcode: number ,phoneNumber: string, amo
             "PartyA": +phoneNumber,
             "PartyB": BSshortcode,
             "PhoneNumber": +phoneNumber,
-            "CallBackURL": "https://munchpay_customerstab.jaweki.com/lipa",
+            "CallBackURL": "https://munchpay-customerstab.jaweki.com/api/lipa",
             "AccountReference": "Munch_Pay",
             "TransactionDesc": "Food Order" 
         }
@@ -118,7 +118,8 @@ async function requestMpesaPayment(BSshortcode: number ,phoneNumber: string, amo
         return await response.data;
 
     } catch (error: any) {
-        console.log("Error at lipa endpoint, in requestMpesaPayment(): ", error.message);
+        console.log("Error at lipa endpoint, in requestMpesaPayment(): ", error.response);
+        console.log("Error message: ", error.message);
         return null;
     }
     
