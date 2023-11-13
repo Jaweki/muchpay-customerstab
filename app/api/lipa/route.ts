@@ -4,8 +4,55 @@ import { NextRequest, NextResponse } from "next/server";
 
 
 export const POST = async (req: NextRequest, res: NextResponse) => {
+    const incomingRequest = await req.json() || null;
+    const mpesa_api_callback = incomingRequest.Body.stkCallback || null;
+
+    console.log('\n\n', incomingRequest || mpesa_api_callback);
+
+    if (incomingRequest.order && incomingRequest.customer) {
+        const response = await client_payment_request(incomingRequest);
+        return response;
+    } else if (mpesa_api_callback) {
+        const response = await mpesa_api_callback_endpoint(mpesa_api_callback);
+        return response;
+    }
+    
+}
+
+async function mpesa_api_callback_endpoint(mpesa_api_callback: any) {
     try {
-        const {order, customer}: OrderData = await req.json();
+        if (mpesa_api_callback.ResultDesc.includes('successfully')) {
+            const mpesa_refNo = mpesa_api_callback.CallbackMetadata.Item.find((item: any) => item.Name === 'MpesaReceiptNumber');
+            
+            const response: ConfirmDataProps = {
+                message: mpesa_api_callback.ResultDesc,
+                receipt_no: timeStamp(),
+                mpesa_refNo
+            }
+
+            return new NextResponse(JSON.stringify(response), { status: 201});
+        } else if (mpesa_api_callback.ResultDesc.includes('cancelled') || mpesa_api_callback.ResultDesc.includes('insufficient') || mpesa_api_callback.ResultDesc.includes('timeout')) {
+            const response: ConfirmDataProps = {
+                message: mpesa_api_callback.ResultDesc,
+            }
+            return new NextResponse(JSON.stringify({ response }), { status: 201 });
+        } else if (mpesa_api_callback.ResultDesc.includes('invalid')) {
+            const response: ConfirmDataProps = {
+                message: "M-pesa claims invalid pin. Transaction Cancelled!",
+            }
+            return new NextResponse(JSON.stringify({ response }), { status: 201 });
+        } else {
+            throw new Error("Error. Undefined callback request from mpesa...");
+        }
+    } catch (error) {
+        console.log("Error at lipa endpoint during callback: ", error);
+        return new NextResponse(JSON.stringify({ error: `${error}` }), { status: 500});
+    }
+}
+
+async function client_payment_request(incomingRequest: any) {
+    try {
+        const {order, customer}: OrderData = incomingRequest;
 
         let total_bill = 0;
         order.forEach((food) => {
@@ -15,29 +62,28 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
         const mpesaNumber = editMpesaNumber(customer.contact);
 
         if (!mpesaNumber) {
-            throw new Error("Invalid Mpesa Number");
+            return new NextResponse(JSON.stringify({ error: "Invalid Mpesa Number"}), { status: 400});
         }
-
-        console.log(timeStamp());
 
         const BSshortcode = 174379;
 
-        const payment_request = await requestMpesaPayment(BSshortcode, mpesaNumber, total_bill);
+        const mpesa_api_response: any = await requestMpesaPayment(BSshortcode, mpesaNumber, total_bill);
 
-        console.log(payment_request);
-
-
-        const response: ConfirmDataProps = {
-            message: "Success",
-            receipt_no: "#SampleReceipt...",
-            mpesa_refNo: "#SampleRefno..."
+        if (mpesa_api_response.ResponseDescription.toLowerCase().includes("success")) {
+            console.log("Payment Via Mpesa, Request accepted for processing... await confirmation.");
+        } else if (mpesa_api_response.payload_error) {
+            return new NextResponse(JSON.stringify({ error: mpesa_api_response.payload_error}));
+        } else {
+            return new NextResponse(JSON.stringify({ error: "Mpesa service unavailable..."}), { status: 503 });
         }
 
-        return new NextResponse(JSON.stringify(response), { status: 201});
+
     } catch (error) {
-        console.log(error);
+        console.log("Error at lipa endpoint: ", error);
+        return new NextResponse(JSON.stringify({ error: "Internal server error..." }), { status: 500});
     }
 }
+
 
 function editMpesaNumber(contact: string) {
     if (contact.startsWith("+254")) {
@@ -120,7 +166,14 @@ async function requestMpesaPayment(BSshortcode: number ,phoneNumber: string, amo
     } catch (error: any) {
         console.log("Error at lipa endpoint, in requestMpesaPayment(): ", error.response);
         console.log("Error message: ", error.message);
-        return null;
+        if (error.response) {
+            // If the error has a response property
+            const error_message = error.response.data.errorMessage;
+
+            return { payload_error: error_message }
+        } else {
+            return null;
+        }
     }
     
 }
