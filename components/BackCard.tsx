@@ -51,22 +51,32 @@ const BackCard = ({
       };
       const response = await axios.post(url, payload);
 
-      const data = await response.data;
+      const data = response.data;
 
-      if (response.status === 201 && data) {
+      console.log("Lipa na mpesa response: ", data);
+      if (response.status === 201) {
         setConfirmData({
-          receipt_no: data.receipt_no,
-          mpesa_refNo: data.mpesa_refNo,
-          message: data.message,
+          receipt_no: data.success.receipt_no,
+          mpesa_refNo: data.success.mpesa_refNo,
+          message: data.success.message,
         });
         setCardSide("back");
         setCurrentStep(4);
 
         const frontCardDiv = document.querySelector(`.${styles.card}`);
         frontCardDiv?.classList.toggle(`${styles.rotateFront}`);
-      } else {
+      } else if (response.status === 400) {
         setConfirmData({
-          message: data.message,
+          message: data.fail_message,
+        });
+        setCardSide("back");
+        setCurrentStep(4);
+
+        const frontCardDiv = document.querySelector(`.${styles.card}`);
+        frontCardDiv?.classList.toggle(`${styles.rotateFront}`);
+      } else if (response.status === 500) {
+        setConfirmData({
+          message: data.fail_message,
         });
         setCardSide("back");
         setCurrentStep(4);

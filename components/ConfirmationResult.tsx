@@ -1,6 +1,7 @@
 import styles from "@/styles/MainCard.module.css";
 import { ConfirmDataProps } from "@/utils/Interface";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 const ConfirmationResult = ({
   confirmData,
@@ -26,7 +27,49 @@ const ConfirmationResult = ({
     };
   }, [okButton]);
   return (
-    <div className={`${styles.backCard} container`}>ConfirmationResult</div>
+    <div className={`${styles.backCard} container`}>
+      {confirmData?.mpesa_refNo && confirmData.receipt_no ? (
+        <div className="w-full flex flex-col">
+          <span className=" text-[25px] font-extrabold text-black">
+            Confirmed
+          </span>
+          <div className="flex flex-row">
+            <p className="flex flex-col">
+              <span className="">
+                Mpesa reference No.: {confirmData?.mpesa_refNo}{" "}
+              </span>
+              <span className="">
+                Order receipt No.: {confirmData?.receipt_no}{" "}
+              </span>
+            </p>
+            <Image
+              src={"/confirmtic.svg"}
+              alt="Confirmed tick icon"
+              width={60}
+              height={60}
+            />
+          </div>
+          <div className=" w-full text-lime-400 font-serif font-semibold text-[18px]">
+            {confirmData?.message}
+          </div>
+        </div>
+      ) : (
+        <div className="w-full flex flex-col">
+          <span className=" text-[25px] font-extrabold text-black">
+            Failed!
+          </span>
+          <Image
+            src={"/error.svg"}
+            alt="Confirmed tick icon"
+            width={60}
+            height={60}
+          />
+          <div className=" w-full text-lime-400 font-serif font-semibold text-[18px]">
+            {confirmData?.message}
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

@@ -34,3 +34,24 @@ export interface FoodOrdered {
         regNo: string;
     }
   }
+
+  export type MpesaAcceptedPendingCallbackType = {
+    MerchantRequestID: string;
+    CheckoutRequestID: string;
+    ResponseCode: string | number;
+   ResponseDescription: string;
+   CustomerMessage: string;
+  }
+
+  export type MPESA_CALLBACK_DOCS_STORE_TYPE = {
+    MerchantRequestID: string,          
+    CheckoutRequestID: string,
+    ResultDesc: string,    
+    ResultCode?: number,
+    CallbackMetadata?: {
+        phoneNumber: string;
+        date: Date;
+        mpesaReceiptNumber: string;
+        amount: number;
+    }
+  }
