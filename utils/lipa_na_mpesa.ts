@@ -64,7 +64,7 @@ export async function requestMpesaPayment(BSshortcode: number ,phoneNumber: stri
             "PartyA": +phoneNumber,
             "PartyB": BSshortcode,
             "PhoneNumber": +phoneNumber,
-            "CallBackURL": "https://munchpay-customerstab.jaweki.com/api/callback",
+            "CallBackURL": "https://muchpay-v2-jaweki-dev.vercel.app/api/callback",
             "AccountReference": "Munch_Pay",
             "TransactionDesc": "Food Order" 
         }
