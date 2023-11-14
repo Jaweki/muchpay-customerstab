@@ -3,9 +3,6 @@ import { mpesa_api_callback_endpoint } from "@/utils/lipa_na_mpesa";
 import { NextApiResponse } from "next";
 import { NextRequest, NextResponse } from "next/server";
 
-
-export const mpesa_callback_doc = {};
-
 export const POST = async (req: NextRequest, res: NextApiResponse) => {
     try {
         const incomingRequest = await req.json();
