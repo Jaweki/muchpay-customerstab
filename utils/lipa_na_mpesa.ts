@@ -86,13 +86,14 @@ export async function requestMpesaPayment(BSshortcode: number ,phoneNumber: stri
         const startTime = Date.now();
         let matchedTransaction = {} as MPESA_CALLBACK_DOCS_STORE_TYPE;
         while(Date.now() - startTime < timeout * 1000) {
-            await new Promise(resolve => setTimeout(resolve, 3000));
-            MPESA_CALLBACK_DOCS_STORE.find(confirmDoc => {
-                if(confirmDoc.MerchantRequestID == MerchantRequestID && confirmDoc.CheckoutRequestID == CheckoutRequestID) {
+            // MPESA_CALLBACK_DOCS_STORE.find(confirmDoc => {
+            //     if(confirmDoc.MerchantRequestID == MerchantRequestID && confirmDoc.CheckoutRequestID == CheckoutRequestID) {
                     
-                    matchedTransaction = confirmDoc;
-                }
-            });
+            //         matchedTransaction = confirmDoc;
+            //     }
+            // });
+            console.log("Checking Array of complete docs: ", MPESA_CALLBACK_DOCS_STORE);
+            await new Promise(resolve => setTimeout(resolve, 3000));
         }
 
         console.log("After transaction doc: ", matchedTransaction);
@@ -190,7 +191,6 @@ export async function mpesa_api_callback_endpoint(mpesa_api_callback: MPESA_CALL
             ResultDesc: "stk-push cancelled. Transaction failed",
         }
 
-        console.log(closedTransacrionDoc);
         MPESA_CALLBACK_DOCS_STORE.push(closedTransacrionDoc);
     } else if (mpesa_api_callback.ResultCode === 1) {
         const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
