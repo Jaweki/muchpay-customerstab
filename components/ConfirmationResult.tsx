@@ -43,7 +43,7 @@ const ConfirmationResult = ({
               </span>
             </p>
             <Image
-              src={"/confirmtic.svg"}
+              src={"/check-mark.svg"}
               alt="Confirmed tick icon"
               width={60}
               height={60}
@@ -59,7 +59,7 @@ const ConfirmationResult = ({
             Failed!
           </span>
           <Image
-            src={"/error.svg"}
+            src={"/error-icon.png"}
             alt="Confirmed tick icon"
             width={60}
             height={60}
