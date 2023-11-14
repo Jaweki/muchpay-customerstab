@@ -1,5 +1,6 @@
 import axios from "axios";
 import { ConfirmDataProps, MPESA_CALLBACK_DOCS_STORE_TYPE, MpesaAcceptedPendingCallbackType } from "./Interface";
+import { error } from "console";
 
 export function editMpesaNumber(contact: string) {
     if (contact.startsWith("+254")) {
@@ -81,10 +82,10 @@ export async function requestMpesaPayment(BSshortcode: number ,phoneNumber: stri
         const { MerchantRequestID, CheckoutRequestID} = await response.data as MpesaAcceptedPendingCallbackType;
 
         let flag = true;
-        let matchedTransaction: MPESA_CALLBACK_DOCS_STORE_TYPE | null= null;
+        let matchedTransaction = {} as MPESA_CALLBACK_DOCS_STORE_TYPE;
         while(flag) {
             await new Promise(resolve => setTimeout(resolve, 3000));
-            MPESA_CALLBACK_DOCS_STORE.find(confirmDoc => {
+            MPESA_CALLBACK_DOCS_STORE.map(confirmDoc => {
                 if(confirmDoc.MerchantRequestID === MerchantRequestID && confirmDoc.CheckoutRequestID === CheckoutRequestID) {
                     flag = false;
                     matchedTransaction = confirmDoc;
@@ -92,13 +93,19 @@ export async function requestMpesaPayment(BSshortcode: number ,phoneNumber: stri
             });
         }
         
-        if (matchedTransaction) {
+        if (matchedTransaction.CallbackMetadata) {
             return {
                 status: 'success',
                 resultData: matchedTransaction,
             }
+        } else if (!matchedTransaction.CallbackMetadata) {
+            throw new Error(JSON.stringify({
+                status: 'error',
+                messsage: matchedTransaction.ResultDesc,
+                code: 400,
+            }));
         } else {
-            throw new Error("Internal server error!");
+            throw new Error("Internal system error!");
         }
     } catch (error: any) {
         // If error is from within mpesa API:

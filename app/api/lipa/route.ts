@@ -33,12 +33,12 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
 
         const mpesa_api_response: MpesaApiResponseType = await requestMpesaPayment(BSshortcode, mpesaNumber, total_bill);
 
-        // const payload: ConfirmDataProps = {
-        //     message: mpesa_api_response.resultData.ResultDesc,
-        //     receipt_no: mpesa_api_response.resultData.MerchantRequestID,
-        //     mpesa_refNo: mpesa_api_response.resultData.CallbackMetadata?.mpesaReceiptNumber
-        // }
-        return new NextResponse(JSON.stringify({ success: mpesa_api_response }), { status: 201});
+        const payload: ConfirmDataProps = {
+            message: mpesa_api_response.resultData.ResultDesc,
+            receipt_no: mpesa_api_response.resultData.MerchantRequestID,
+            mpesa_refNo: mpesa_api_response.resultData.CallbackMetadata?.mpesaReceiptNumber
+        }
+        return new NextResponse(JSON.stringify({ success: payload }), { status: 201});
 
     } catch (error: any) {
 
