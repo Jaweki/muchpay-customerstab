@@ -2,6 +2,7 @@ import { ConfirmDataProps, MPESA_CALLBACK_DOCS_STORE_TYPE, OrderData } from "@/u
 import { editMpesaNumber, requestMpesaPayment, timeStamp } from "@/utils/lipa_na_mpesa";
 import { NextRequest, NextResponse } from "next/server";
 
+export const maxDuration = 300;
 type MpesaApiResponseType = {
     status: string,
     resultData: MPESA_CALLBACK_DOCS_STORE_TYPE;
@@ -40,7 +41,7 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
         return new NextResponse(JSON.stringify({ success: payload }), { status: 201});
 
     } catch (error: any) {
-        
+
         console.log("Error at lipa endpoint: ", error);
         if (error.status === "error") {
             return new NextResponse(JSON.stringify({ fail_message: `${error.message}` }), { status: error.code });
