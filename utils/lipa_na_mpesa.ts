@@ -142,10 +142,10 @@ export async function requestMpesaPayment(BSshortcode: number ,phoneNumber: stri
 
 
 export async function mpesa_api_callback_endpoint(mpesa_api_callback: MPESA_CALLBACK_DOCS_STORE_TYPE | any) {
-    console.log("Callback data: ", mpesa_api_callback);
+    console.log("Callback data: ", mpesa_api_callback.json());
     if (mpesa_api_callback) {
 
-        MPESA_CALLBACK_DOCS_STORE.push(mpesa_api_callback);
+        MPESA_CALLBACK_DOCS_STORE.push(await mpesa_api_callback.json());
     }
     if (mpesa_api_callback.ResultCode === 0) {
         // now send a success confirmation to the meals customer...
