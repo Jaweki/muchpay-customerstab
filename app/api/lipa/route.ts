@@ -2,7 +2,7 @@ import { ConfirmDataProps, MPESA_CALLBACK_DOCS_STORE_TYPE, OrderData } from "@/u
 import { editMpesaNumber, requestMpesaPayment, timeStamp } from "@/utils/lipa_na_mpesa";
 import { NextRequest, NextResponse } from "next/server";
 
-export const maxDuration = 300;
+export const maxDuration = 120;
 type MpesaApiResponseType = {
     status: string,
     resultData: MPESA_CALLBACK_DOCS_STORE_TYPE;
