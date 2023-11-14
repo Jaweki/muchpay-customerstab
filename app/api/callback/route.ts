@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (req: NextRequest, res: NextResponse) => {
     try {
-        const incomingRequest: any = req.body;
+        const incomingRequest: any = await req.json();
         // const mpesa_api_callback: MPESA_CALLBACK_DOCS_STORE_TYPE = incomingRequest.Body.stkCallback
         
         await mpesa_api_callback_endpoint(incomingRequest);
