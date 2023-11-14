@@ -1,8 +1,6 @@
 {
     "functions": {
-       "api/*/*.ts": {
-        "maxDuration": 120
-      }, "app/api/lipa/*.ts": {
+       "api/lipa/route.ts": {
         "maxDuration": 120
       }
     }
