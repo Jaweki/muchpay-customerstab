@@ -81,17 +81,20 @@ export async function requestMpesaPayment(BSshortcode: number ,phoneNumber: stri
 
         const { MerchantRequestID, CheckoutRequestID} = await response.data as MpesaAcceptedPendingCallbackType;
 
+        console.log({"M_ID": MerchantRequestID, "CH_ID":CheckoutRequestID });
         let flag = true;
         let matchedTransaction = {} as MPESA_CALLBACK_DOCS_STORE_TYPE;
         while(flag) {
             await new Promise(resolve => setTimeout(resolve, 3000));
             MPESA_CALLBACK_DOCS_STORE.map(confirmDoc => {
-                if(confirmDoc.MerchantRequestID === MerchantRequestID && confirmDoc.CheckoutRequestID === CheckoutRequestID) {
+                if(confirmDoc.MerchantRequestID == MerchantRequestID && confirmDoc.CheckoutRequestID == CheckoutRequestID) {
                     flag = false;
                     matchedTransaction = confirmDoc;
                 }
             });
         }
+
+        console.log("After transaction doc: ", matchedTransaction);
         
         if (matchedTransaction.CallbackMetadata) {
             return {
