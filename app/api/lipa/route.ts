@@ -1,5 +1,5 @@
 import { ConfirmDataProps, MPESA_CALLBACK_DOCS_STORE_TYPE, OrderData } from "@/utils/Interface";
-import { editMpesaNumber, requestMpesaPayment, timeStamp } from "@/utils/lipa_na_mpesa";
+import { editMpesaNumber, requestMpesaPayment} from "@/utils/lipa_na_mpesa";
 import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 120;

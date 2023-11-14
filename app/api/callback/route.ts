@@ -1,6 +1,5 @@
 import { MPESA_CALLBACK_DOCS_STORE_TYPE } from "@/utils/Interface";
 import { mpesa_api_callback_endpoint } from "@/utils/lipa_na_mpesa";
-import { NextApiResponse } from "next";
 import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (req: NextRequest, res: NextResponse) => {
