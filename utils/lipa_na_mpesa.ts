@@ -47,7 +47,7 @@ export async function gen_access_token() {
     
 }
 
-const MPESA_CALLBACK_DOCS_STORE: MPESA_CALLBACK_DOCS_STORE_TYPE[] = [];
+const MPESA_CALLBACK_DOCS_STORE: MPESA_CALLBACK_DOCS_STORE_TYPE[] | any = [];
 export async function requestMpesaPayment(BSshortcode: number ,phoneNumber: string, amount: number, retries = 2) {
 
     try {
@@ -84,12 +84,16 @@ export async function requestMpesaPayment(BSshortcode: number ,phoneNumber: stri
         let matchedTransaction: MPESA_CALLBACK_DOCS_STORE_TYPE | null= null;
         while(flag) {
             await new Promise(resolve => setTimeout(resolve, 3000));
-            MPESA_CALLBACK_DOCS_STORE.find(confirmDoc => {
-                if(confirmDoc.MerchantRequestID === MerchantRequestID && confirmDoc.CheckoutRequestID === CheckoutRequestID) {
-                    flag = false;
-                    matchedTransaction = confirmDoc;
-                }
-            });
+            // MPESA_CALLBACK_DOCS_STORE.find(confirmDoc => {
+            //     if(confirmDoc.MerchantRequestID === MerchantRequestID && confirmDoc.CheckoutRequestID === CheckoutRequestID) {
+            //         flag = false;
+            //         matchedTransaction = confirmDoc;
+            //     }
+            // });
+            if (MPESA_CALLBACK_DOCS_STORE.length > 0) {
+                flag = false;
+                matchedTransaction = MPESA_CALLBACK_DOCS_STORE[0];
+            }
         }
         
         if (matchedTransaction) {
@@ -137,8 +141,12 @@ export async function requestMpesaPayment(BSshortcode: number ,phoneNumber: stri
 
 
 
-export async function mpesa_api_callback_endpoint(mpesa_api_callback: MPESA_CALLBACK_DOCS_STORE_TYPE) {
+export async function mpesa_api_callback_endpoint(mpesa_api_callback: MPESA_CALLBACK_DOCS_STORE_TYPE | any) {
     console.log("Callback data: ", mpesa_api_callback);
+    if (mpesa_api_callback) {
+
+        MPESA_CALLBACK_DOCS_STORE.push(mpesa_api_callback);
+    }
     if (mpesa_api_callback.ResultCode === 0) {
         // now send a success confirmation to the meals customer...
         const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
