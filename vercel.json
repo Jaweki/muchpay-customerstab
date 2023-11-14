@@ -1,6 +1,10 @@
 {
     "functions": {
-      "api/lipa": {
+      "api/**/*.ts": {
+        "maxDuration": 120
+      }, "api/*/*.ts": {
+        "maxDuration": 120
+      }, "app/api/lipa/*.ts": {
         "maxDuration": 120
       }
     }
