@@ -7,7 +7,7 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
     try {
         const incomingRequest: any = req.body;
         const mpesa_api_callback: MPESA_CALLBACK_DOCS_STORE_TYPE = incomingRequest.Body.stkCallback
-        console.log("Callback data: ", mpesa_api_callback);
+        
         await mpesa_api_callback_endpoint(mpesa_api_callback);
         return new NextResponse(JSON.stringify("OK"), { status: 200 });
     } catch (error) {
