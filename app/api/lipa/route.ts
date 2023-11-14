@@ -40,6 +40,7 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
         return new NextResponse(JSON.stringify({ success: payload }), { status: 201});
 
     } catch (error: any) {
+        
         console.log("Error at lipa endpoint: ", error);
         if (error.status === "error") {
             return new NextResponse(JSON.stringify({ fail_message: `${error.message}` }), { status: error.code });
