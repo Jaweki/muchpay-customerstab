@@ -197,5 +197,5 @@ export async function mpesa_api_callback_endpoint(mpesa_api_callback: MPESA_CALL
     } else {
         throw new Error(`Unhandles error: ${JSON.stringify(mpesa_api_callback)}`);
     }
-    await redis.expire(data_key, 60);
+    // await redis.expire(data_key, 60);
 }
