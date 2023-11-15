@@ -2,21 +2,19 @@ import axios from "axios";
 import { MPESA_CALLBACK_DOCS_STORE_TYPE, MpesaAcceptedPendingCallbackType } from "./Interface";
 import { redis } from "./redis_config";
 
-export function editMpesaNumber(phoneNumber: string) {
-    const contact = phoneNumber;
-    // if (!contact) { 
-    //     return null;
-    // }
-    // if (contact.startsWith("+254")) {
-    //     return contact.substring(1);
-    // } else if (contact.startsWith("254")) {
-    //     return contact;
-    // } else if (contact.startsWith("07") || contact.startsWith("01")) {
-    //     return "254" + contact.substring(1);
-    // } else {
-    //     return null;
-    // }
-    return contact;
+export function editMpesaNumber(contact: string) {
+    if (!contact) { 
+        return null;
+    }
+    if (contact.startsWith("+254")) {
+        return contact.substring(1);
+    } else if (contact.startsWith("254")) {
+        return contact;
+    } else if (contact.startsWith("07") || contact.startsWith("01")) {
+        return "254" + contact.substring(1);
+    } else {
+        return null;
+    }
 }
 
 export function timeStamp() {
