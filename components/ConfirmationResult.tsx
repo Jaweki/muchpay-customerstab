@@ -60,8 +60,8 @@ const ConfirmationResult = ({
           </div>
         </div>
       ) : (
-        <div className="w-full flex flex-col items-center relative gap-10">
-          <span className=" text-[25px] font-extrabold text-black">
+        <div className="w-full flex flex-col items-center relative gap-16">
+          <span className=" text-[40px] font-extrabold text-black">
             Failed!
           </span>
           <Image
@@ -70,7 +70,7 @@ const ConfirmationResult = ({
             width={60}
             height={60}
           />
-          <div className=" w-full text-lime-400 font-serif font-semibold text-[18px] text-center absolute bottom-4">
+          <div className=" w-full text-lime-400 font-serif font-semibold text-[28px] text-center absolute bottom-4 ">
             {confirmData?.message}
           </div>
         </div>
