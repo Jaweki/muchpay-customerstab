@@ -147,7 +147,7 @@ export async function requestMpesaPayment(BSshortcode: number ,phoneNumber: stri
 
 export async function mpesa_api_callback_endpoint(mpesa_api_callback: MPESA_CALLBACK_DOCS_STORE_TYPE) {
     
-    const data_key = `${mpesa_api_callback.MerchantRequestID}-${mpesa_api_callback.CheckoutRequestID}`;
+    // const data_key = `${mpesa_api_callback.MerchantRequestID}-${mpesa_api_callback.CheckoutRequestID}`;
     if (mpesa_api_callback.ResultCode === 0) {
         // now send a success confirmation to the meals customer...
         const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
@@ -157,8 +157,8 @@ export async function mpesa_api_callback_endpoint(mpesa_api_callback: MPESA_CALL
             CallbackMetadata: mpesa_api_callback.CallbackMetadata
         }
 
-        const data_value = JSON.stringify(closedTransacrionDoc);
-        await redis.set(data_key, data_value );
+        // const data_value = JSON.stringify(closedTransacrionDoc);
+        // await redis.set(data_key, data_value );
     } else if (mpesa_api_callback.ResultCode === 1037) {
         const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
             MerchantRequestID: mpesa_api_callback.MerchantRequestID,
@@ -166,8 +166,8 @@ export async function mpesa_api_callback_endpoint(mpesa_api_callback: MPESA_CALL
             ResultDesc: "Mpesa cannot reach given mpesa pay number",
         }
 
-        const data_value = JSON.stringify(closedTransacrionDoc);
-        await redis.set(data_key, data_value );
+        // const data_value = JSON.stringify(closedTransacrionDoc);
+        // await redis.set(data_key, data_value );
     } else if (mpesa_api_callback.ResultCode === 1001) {
         const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
             MerchantRequestID: mpesa_api_callback.MerchantRequestID,
@@ -175,8 +175,8 @@ export async function mpesa_api_callback_endpoint(mpesa_api_callback: MPESA_CALL
             ResultDesc: "a transaction is already in process for the current subscriber. Wait for 2-3 minutes try again",
         }
 
-        const data_value = JSON.stringify(closedTransacrionDoc);
-        await redis.set(data_key, data_value );
+        // const data_value = JSON.stringify(closedTransacrionDoc);
+        // await redis.set(data_key, data_value );
     } else if (mpesa_api_callback.ResultCode === 1032) {
         const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
             MerchantRequestID: mpesa_api_callback.MerchantRequestID,
@@ -184,8 +184,8 @@ export async function mpesa_api_callback_endpoint(mpesa_api_callback: MPESA_CALL
             ResultDesc: "stk-push cancelled. Transaction failed",
         }
 
-        const data_value = JSON.stringify(closedTransacrionDoc);
-        await redis.set(data_key, data_value );
+        // const data_value = JSON.stringify(closedTransacrionDoc);
+        // await redis.set(data_key, data_value );
     } else if (mpesa_api_callback.ResultCode === 1025 || mpesa_api_callback.ResultCode === 1019 || mpesa_api_callback.ResultCode === 9999 || mpesa_api_callback.ResultCode === 1 || mpesa_api_callback.ResultCode === 2001 ) {
         const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
             MerchantRequestID: mpesa_api_callback.MerchantRequestID,
@@ -193,10 +193,10 @@ export async function mpesa_api_callback_endpoint(mpesa_api_callback: MPESA_CALL
             ResultDesc: mpesa_api_callback.ResultDesc,
         }
 
-        const data_value = JSON.stringify(closedTransacrionDoc);
-        await redis.set(data_key, data_value );
+        // const data_value = JSON.stringify(closedTransacrionDoc);
+        // await redis.set(data_key, data_value );
     } else {
         throw new Error(`Unhandles error: ${JSON.stringify(mpesa_api_callback)}`);
     }
-    await redis.expire(data_key, 60);
+    // await redis.expire(data_key, 60);
 }
