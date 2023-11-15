@@ -1,16 +1,26 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { connectToDB } from "@/utils/connectToDB";
+import MenuSchema from "@/models/MenuSchema";
 
-export const GET = ():NextResponse => {
+export const GET = async (req: NextRequest, res: NextResponse) => {
 
-    const foodMenuList = [
-        { id: 1, name: "Food1", price: 1, vat: 1 },
-        { id: 2, name: "Food2", price: 2, vat: 2 },
-        { id: 3, name: "Food3", price: 3, vat: 3 },
-        { id: 4, name: "Food4", price: 4, vat: 4 },
-        { id: 5, name: "Food5", price: 5, vat: 5 },
-        { id: 6, name: "Food6", price: 6, vat: 6 },
-        { id: 7, name: "Food7", price: 7, vat: 7 },
-    ];
+    try {
+        const isConnected = await connectToDB();
 
-    return NextResponse.json(foodMenuList);
+        if (!isConnected) {
+            throw new Error("Failed to connect to db...");
+        }
+
+        const menu = await MenuSchema.find({});
+    
+        if (!menu) {
+            return NextResponse.json("Menu is not set");
+        }
+
+        return NextResponse.json(menu);
+    } catch (error) {
+        console.log("Error in the fetch food_menu Endpoint: ", error);
+        return new NextResponse(JSON.stringify("System Error, Failed to fetch menu."), { status: 500});
+    }
+    
 }
