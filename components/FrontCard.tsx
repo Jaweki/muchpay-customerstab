@@ -54,7 +54,7 @@ const FrontCard = ({
 
       <div id="foodMenu" className="basis-3/4 flex flex-col">
         <div className="flex flex-col p-2 h-full items-center overflow-y-visible overflow-x-hidden gap-2">
-          {foodMenu ? (
+          {foodMenu && foodMenu?.length > 0 ? (
             foodMenu.map((food) => (
               <div
                 className="flex flex-row rounded h-8 w-[95%] p-1 items-center container hover:scale-105"
@@ -102,7 +102,9 @@ const FrontCard = ({
               </div>
             ))
           ) : (
-            <div>Menu Is Empty. Contact the Manager to poluate it.</div>
+            <div className="h-full w-3/4 italic font-bold text-center text-[20px] flex flex-col justify-center items-center font-serif">
+              Empty Menu. Contact the Manager to poluate it.
+            </div>
           )}
         </div>
         <span>{foodMenu?.length ?? 0} Meals Avaliable On Menu</span>
