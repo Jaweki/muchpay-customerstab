@@ -1,0 +1,88 @@
+.card {
+    position: relative;
+    width: 65vw;
+    height: 70vh;
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    transform-origin: center;
+    border-radius: 20px;
+    align-items: center;
+    justify-content: center;
+    display: flex; 
+    background-image: linear-gradient(135deg, #6effc1, #00b300, #008000); /* Varying gradient background for the card */
+    z-index: 999;
+    transition: 3s cubic-bezier(0,1.56,.92,.27);
+}
+
+.card .frontCard,
+.card .backCard {
+    position: absolute;
+    display: flex;
+    backface-visibility: hidden;
+    scroll-snap-type: mandatory;
+    scroll-margin: 20px;
+}
+
+
+.card .frontCard {
+    width: 70%;
+    height: 70%;
+    padding: 20px;
+    transform-style: preserve-3d;
+    transform: rotateY(0deg) translateZ(70px);
+    border-radius: 3%;
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0), #f2f2f2);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    overflow-y: auto;
+    overflow-wrap: normal;
+    overflow-x: hidden;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    perspective: 1000px;
+    scroll-behavior: smooth;
+    text-shadow: 10px 10px 100px rgba(0, 0, 0, 0.5);
+    text-rendering: optimizeSpeed;
+}
+
+.card .backCard {
+    width: 85%;
+    height: 85%;
+    padding: 20px;
+    border-radius: 3%;
+    transform-style: preserve-3d;
+    transform: rotateY(180deg) translateZ(70px);
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0), #f2f2f2);
+    overflow-y: auto;
+    overflow-wrap: normal;
+    overflow-x: hidden;
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+    perspective: 1000px;
+} 
+
+.frontButton {
+    transform: rotateY(0deg) translateZ(70px);
+}
+
+.backButton { 
+    transform: rotateY(180deg) translateZ(70px);
+}
+
+
+.rotateFront {
+    transform: rotateY(180deg) rotateX(360deg);
+    transform-style: preserve-3d;
+}
+
+.animatePending {
+    animation: bounce 2s infinite alternate;
+}
+
+@keyframes bounce {
+    0% {
+        transform: scale(0.7);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
