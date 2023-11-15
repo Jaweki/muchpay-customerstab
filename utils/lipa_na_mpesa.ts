@@ -1,6 +1,6 @@
 import axios from "axios";
-import { ConfirmDataProps, MPESA_CALLBACK_DOCS_STORE_TYPE, MpesaAcceptedPendingCallbackType } from "./Interface";
-import { error } from "console";
+import { MPESA_CALLBACK_DOCS_STORE_TYPE, MpesaAcceptedPendingCallbackType } from "./Interface";
+import { redis } from "./redis_config";
 
 export function editMpesaNumber(contact: string) {
     if (contact.startsWith("+254")) {
@@ -86,13 +86,11 @@ export async function requestMpesaPayment(BSshortcode: number ,phoneNumber: stri
         const startTime = Date.now();
         let matchedTransaction = {} as MPESA_CALLBACK_DOCS_STORE_TYPE;
         while(Date.now() - startTime < timeout * 1000) {
-            // MPESA_CALLBACK_DOCS_STORE.find(confirmDoc => {
-            //     if(confirmDoc.MerchantRequestID == MerchantRequestID && confirmDoc.CheckoutRequestID == CheckoutRequestID) {
-                    
-            //         matchedTransaction = confirmDoc;
-            //     }
-            // });
-            console.log("Checking Array of complete docs: ", MPESA_CALLBACK_DOCS_STORE);
+            const data: any = await redis.get(`${MerchantRequestID}-${CheckoutRequestID}`)
+            if (data) {
+                matchedTransaction = JSON.parse(data);
+                break;
+            }
             await new Promise(resolve => setTimeout(resolve, 3000));
         }
 
@@ -128,20 +126,16 @@ export async function requestMpesaPayment(BSshortcode: number ,phoneNumber: stri
                 code: 400
             }
             throw new Error(response);
+        } else if (retries > 0) {
+            await new Promise(resolve => setTimeout(resolve, 10000));
+            return requestMpesaPayment(BSshortcode, phoneNumber, amount, retries - 1);
         } else {
-            
-            if (retries > 0) {
-                await new Promise(resolve => setTimeout(resolve, 10000));
-                return requestMpesaPayment(BSshortcode, phoneNumber, amount, retries - 1);
-            } else {
-                const response: any =  { 
-                    status: 'error',
-                    message: error.message,
-                    code: 400
-                }
-                throw new Error(response);
+            const response: any =  { 
+                status: 'error',
+                message: error.message,
+                code: 400
             }
-
+            throw new Error(response);
         }
     }
     
@@ -150,6 +144,8 @@ export async function requestMpesaPayment(BSshortcode: number ,phoneNumber: stri
 
 
 export async function mpesa_api_callback_endpoint(mpesa_api_callback: MPESA_CALLBACK_DOCS_STORE_TYPE) {
+    
+    const data_key = `${mpesa_api_callback.MerchantRequestID}-${mpesa_api_callback.CheckoutRequestID}`;
     if (mpesa_api_callback.ResultCode === 0) {
         // now send a success confirmation to the meals customer...
         const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
@@ -159,7 +155,8 @@ export async function mpesa_api_callback_endpoint(mpesa_api_callback: MPESA_CALL
             CallbackMetadata: mpesa_api_callback.CallbackMetadata
         }
 
-        MPESA_CALLBACK_DOCS_STORE.push(closedTransacrionDoc);
+        const data_value = JSON.stringify(closedTransacrionDoc);
+        await redis.set(data_key, data_value );
     } else if (mpesa_api_callback.ResultCode === 1037) {
         const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
             MerchantRequestID: mpesa_api_callback.MerchantRequestID,
@@ -167,55 +164,8 @@ export async function mpesa_api_callback_endpoint(mpesa_api_callback: MPESA_CALL
             ResultDesc: "Mpesa cannot reach given mpesa pay number",
         }
 
-        MPESA_CALLBACK_DOCS_STORE.push(closedTransacrionDoc);
-    } else if (mpesa_api_callback.ResultCode === 1025) {
-        const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
-            MerchantRequestID: mpesa_api_callback.MerchantRequestID,
-            CheckoutRequestID: mpesa_api_callback.CheckoutRequestID,
-            ResultDesc: mpesa_api_callback.ResultDesc,
-        }
-
-        MPESA_CALLBACK_DOCS_STORE.push(closedTransacrionDoc);
-    } else if (mpesa_api_callback.ResultCode === 9999) {
-        const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
-            MerchantRequestID: mpesa_api_callback.MerchantRequestID,
-            CheckoutRequestID: mpesa_api_callback.CheckoutRequestID,
-            ResultDesc: mpesa_api_callback.ResultDesc,
-        }
-
-        MPESA_CALLBACK_DOCS_STORE.push(closedTransacrionDoc);
-    } else if (mpesa_api_callback.ResultCode === 1032) {
-        const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
-            MerchantRequestID: mpesa_api_callback.MerchantRequestID,
-            CheckoutRequestID: mpesa_api_callback.CheckoutRequestID,
-            ResultDesc: "stk-push cancelled. Transaction failed",
-        }
-
-        MPESA_CALLBACK_DOCS_STORE.push(closedTransacrionDoc);
-    } else if (mpesa_api_callback.ResultCode === 1) {
-        const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
-            MerchantRequestID: mpesa_api_callback.MerchantRequestID,
-            CheckoutRequestID: mpesa_api_callback.CheckoutRequestID,
-            ResultDesc: mpesa_api_callback.ResultDesc,
-        }
-
-        MPESA_CALLBACK_DOCS_STORE.push(closedTransacrionDoc);
-    } else if (mpesa_api_callback.ResultCode === 2001) {
-        const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
-            MerchantRequestID: mpesa_api_callback.MerchantRequestID,
-            CheckoutRequestID: mpesa_api_callback.CheckoutRequestID,
-            ResultDesc: mpesa_api_callback.ResultDesc,
-        }
-
-        MPESA_CALLBACK_DOCS_STORE.push(closedTransacrionDoc);
-    } else if (mpesa_api_callback.ResultCode === 1019) {
-        const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
-            MerchantRequestID: mpesa_api_callback.MerchantRequestID,
-            CheckoutRequestID: mpesa_api_callback.CheckoutRequestID,
-            ResultDesc: mpesa_api_callback.ResultDesc,
-        }
-
-        MPESA_CALLBACK_DOCS_STORE.push(closedTransacrionDoc);
+        const data_value = JSON.stringify(closedTransacrionDoc);
+        await redis.set(data_key, data_value );
     } else if (mpesa_api_callback.ResultCode === 1001) {
         const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
             MerchantRequestID: mpesa_api_callback.MerchantRequestID,
@@ -223,6 +173,28 @@ export async function mpesa_api_callback_endpoint(mpesa_api_callback: MPESA_CALL
             ResultDesc: "a transaction is already in process for the current subscriber. Wait for 2-3 minutes try again",
         }
 
-        MPESA_CALLBACK_DOCS_STORE.push(closedTransacrionDoc);
+        const data_value = JSON.stringify(closedTransacrionDoc);
+        await redis.set(data_key, data_value );
+    } else if (mpesa_api_callback.ResultCode === 1032) {
+        const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
+            MerchantRequestID: mpesa_api_callback.MerchantRequestID,
+            CheckoutRequestID: mpesa_api_callback.CheckoutRequestID,
+            ResultDesc: "stk-push cancelled. Transaction failed",
+        }
+
+        const data_value = JSON.stringify(closedTransacrionDoc);
+        await redis.set(data_key, data_value );
+    } else if (mpesa_api_callback.ResultCode === 1025 || mpesa_api_callback.ResultCode === 1019 || mpesa_api_callback.ResultCode === 9999 || mpesa_api_callback.ResultCode === 1 || mpesa_api_callback.ResultCode === 2001 ) {
+        const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
+            MerchantRequestID: mpesa_api_callback.MerchantRequestID,
+            CheckoutRequestID: mpesa_api_callback.CheckoutRequestID,
+            ResultDesc: mpesa_api_callback.ResultDesc,
+        }
+
+        const data_value = JSON.stringify(closedTransacrionDoc);
+        await redis.set(data_key, data_value );
+    } else {
+        throw new Error(`Unhandles error: ${JSON.stringify(mpesa_api_callback)}`);
     }
+    await redis.expire(data_key, 60);
 }
