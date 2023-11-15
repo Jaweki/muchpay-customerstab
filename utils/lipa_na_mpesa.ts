@@ -3,6 +3,9 @@ import { MPESA_CALLBACK_DOCS_STORE_TYPE, MpesaAcceptedPendingCallbackType } from
 import { redis } from "./redis_config";
 
 export function editMpesaNumber(contact: string) {
+    if (!contact) { 
+        return null;
+    }
     if (contact.startsWith("+254")) {
         return contact.substring(1);
     } else if (contact.startsWith("254")) {
@@ -86,8 +89,8 @@ export async function requestMpesaPayment(BSshortcode: number ,phoneNumber: stri
         const startTime = Date.now();
         let matchedTransaction = {} as MPESA_CALLBACK_DOCS_STORE_TYPE;
         while(Date.now() - startTime < timeout * 1000) {
-            const data: any = await redis.get(`${MerchantRequestID}-${CheckoutRequestID}`)
-            if (data) {
+            if (await redis.exists(`${MerchantRequestID}-${CheckoutRequestID}`)) {
+                const data: any = await redis.get(`${MerchantRequestID}-${CheckoutRequestID}`)
                 matchedTransaction = JSON.parse(data);
                 break;
             }
