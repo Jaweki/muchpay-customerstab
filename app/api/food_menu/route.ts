@@ -14,12 +14,13 @@ export const GET = async (req: NextRequest, res: NextResponse) => {
         const menu = await MenuSchema.find({});
     
         if (!menu) {
-            throw new Error("Menu not set");
+            return NextResponse.json("Menu is not set");
         }
 
         return NextResponse.json(menu);
     } catch (error) {
         console.log("Error in the fetch food_menu Endpoint: ", error);
+        return new NextResponse(JSON.stringify("System Error, Failed to fetch menu."), { status: 500});
     }
     
 }
