@@ -156,8 +156,8 @@ export async function mpesa_api_callback_endpoint(mpesa_api_callback: MPESA_CALL
             CallbackMetadata: mpesa_api_callback.CallbackMetadata
         }
 
-        // const data_value = JSON.stringify(closedTransacrionDoc);
-        // await redis.set(data_key, data_value );
+        const data_value = JSON.stringify(closedTransacrionDoc);
+        await redis.set(data_key, data_value );
     } else if (mpesa_api_callback.ResultCode === 1037) {
         const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
             MerchantRequestID: mpesa_api_callback.MerchantRequestID,
