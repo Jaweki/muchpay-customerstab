@@ -146,7 +146,7 @@ export async function requestMpesaPayment(BSshortcode: number ,phoneNumber: stri
 
 export async function mpesa_api_callback_endpoint(mpesa_api_callback: MPESA_CALLBACK_DOCS_STORE_TYPE) {
     
-    // const data_key = `${mpesa_api_callback.MerchantRequestID}-${mpesa_api_callback.CheckoutRequestID}`;
+    const data_key = `${mpesa_api_callback.MerchantRequestID}-${mpesa_api_callback.CheckoutRequestID}` as string;
     if (mpesa_api_callback.ResultCode === 0) {
         // now send a success confirmation to the meals customer...
         const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
@@ -156,8 +156,8 @@ export async function mpesa_api_callback_endpoint(mpesa_api_callback: MPESA_CALL
             CallbackMetadata: mpesa_api_callback.CallbackMetadata
         }
 
-        // const data_value = JSON.stringify(closedTransacrionDoc);
-        // await redis.set(data_key, data_value );
+        const data_value = JSON.stringify(closedTransacrionDoc);
+        await redis.set(data_key, data_value );
     } else if (mpesa_api_callback.ResultCode === 1037) {
         const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
             MerchantRequestID: mpesa_api_callback.MerchantRequestID,
@@ -197,5 +197,5 @@ export async function mpesa_api_callback_endpoint(mpesa_api_callback: MPESA_CALL
     } else {
         throw new Error(`Unhandles error: ${JSON.stringify(mpesa_api_callback)}`);
     }
-    // await redis.expire(data_key, 60);
+    await redis.expire(data_key, 60);
 }
