@@ -2,7 +2,8 @@ import axios from "axios";
 import { MPESA_CALLBACK_DOCS_STORE_TYPE, MpesaAcceptedPendingCallbackType } from "./Interface";
 import { redis } from "./redis_config";
 
-export function editMpesaNumber(contact: string | null = null) {
+export function editMpesaNumber(phoneNumber: string) {
+    const contact = phoneNumber;
     if (!contact) { 
         return null;
     }
