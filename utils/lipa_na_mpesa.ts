@@ -4,18 +4,19 @@ import { redis } from "./redis_config";
 
 export function editMpesaNumber(phoneNumber: string) {
     const contact = phoneNumber;
-    if (!contact) { 
-        return null;
-    }
-    if (contact.startsWith("+254")) {
-        return contact.substring(1);
-    } else if (contact.startsWith("254")) {
-        return contact;
-    } else if (contact.startsWith("07") || contact.startsWith("01")) {
-        return "254" + contact.substring(1);
-    } else {
-        return null;
-    }
+    // if (!contact) { 
+    //     return null;
+    // }
+    // if (contact.startsWith("+254")) {
+    //     return contact.substring(1);
+    // } else if (contact.startsWith("254")) {
+    //     return contact;
+    // } else if (contact.startsWith("07") || contact.startsWith("01")) {
+    //     return "254" + contact.substring(1);
+    // } else {
+    //     return null;
+    // }
+    return contact;
 }
 
 export function timeStamp() {
