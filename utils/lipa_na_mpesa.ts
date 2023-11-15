@@ -1,9 +1,9 @@
 import axios from "axios";
 import { MPESA_CALLBACK_DOCS_STORE_TYPE, MpesaAcceptedPendingCallbackType } from "./Interface";
-// import { redis } from "./redis_config";
+import { redis } from "./redis_config";
 
 export function editMpesaNumber(contact: string) {
-    
+
     if (contact.startsWith("+254")) {
         return contact.substring(1);
     } else if (contact.startsWith("254")) {
