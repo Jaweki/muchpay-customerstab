@@ -66,7 +66,7 @@ export async function requestMpesaPayment(BSshortcode: number ,phoneNumber: stri
             "PartyA": +phoneNumber,
             "PartyB": BSshortcode,
             "PhoneNumber": +phoneNumber,
-            "CallBackURL": "https://muchpay-v2-jaweki-dev.vercel.app/api/callback",
+            "CallBackURL": "https://muchpay-customerstab.vercel.app/api/callback",
             "AccountReference": "Munch_Pay",
             "TransactionDesc": "Food Order" 
         }
@@ -146,7 +146,7 @@ export async function requestMpesaPayment(BSshortcode: number ,phoneNumber: stri
 
 export async function mpesa_api_callback_endpoint(mpesa_api_callback: MPESA_CALLBACK_DOCS_STORE_TYPE) {
     
-    const data_key = `${mpesa_api_callback.MerchantRequestID}-${mpesa_api_callback.CheckoutRequestID}` as string;
+    const data_key = `${mpesa_api_callback.MerchantRequestID}-${mpesa_api_callback.CheckoutRequestID}`;
     if (mpesa_api_callback.ResultCode === 0) {
         // now send a success confirmation to the meals customer...
         const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
