@@ -106,19 +106,22 @@ const BackCard = ({
   }, [confirmButton, handleSubmitNewOrder]);
 
   const validateContact = (contact: string) => {
-    if (contact.startsWith("+254")) {
+    if (contact.substring(0, 4) === "+254") {
       if (contact.substring(4).length === 9) {
         return true;
       } else {
         return false;
       }
-    } else if (contact.startsWith("254")) {
+    } else if (contact.substring(0, 3) === "254") {
       if (contact.substring(3).length === 9) {
         return true;
       } else {
         return false;
       }
-    } else if (contact.startsWith("07") || contact.startsWith("01")) {
+    } else if (
+      contact.substring(0, 2) === "07" ||
+      contact.substring(0, 2) === "01"
+    ) {
       if (contact.substring(2).length === 8) {
         return true;
       } else {
