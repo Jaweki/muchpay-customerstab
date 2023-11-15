@@ -18,7 +18,7 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
             total_bill += food.price;
         })
 
-        const mpesaNumber = "";//editMpesaNumber(customer.contact);
+        const mpesaNumber = editMpesaNumber(customer.contact);
 
         if (!mpesaNumber) {
             const response: any = {

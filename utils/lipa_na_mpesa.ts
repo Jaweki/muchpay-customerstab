@@ -5,8 +5,7 @@ import { redis } from "./redis_config";
 export function editMpesaNumber(contact: string) {
     if (!contact) { 
         return null;
-    }
-    if (contact.startsWith("+254")) {
+    } else if (contact.startsWith("+254")) {
         return contact.substring(1);
     } else if (contact.startsWith("254")) {
         return contact;
