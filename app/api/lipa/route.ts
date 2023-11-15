@@ -5,7 +5,9 @@ import { NextRequest, NextResponse } from "next/server";
 export const maxDuration = 120;
 type MpesaApiResponseType = {
     status: string,
-    resultData: MPESA_CALLBACK_DOCS_STORE_TYPE;
+    resultData?: MPESA_CALLBACK_DOCS_STORE_TYPE;
+    error_message?: string;
+    error_code?: number;
 }
 
 export const POST = async (req: NextRequest, res: NextResponse) => {
@@ -23,8 +25,8 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
         if (!mpesaNumber) {
             const response: any = {
                 status: "error",
-                message: "Invalid Mpesa Number",
-                code: 400
+                error_message: "Invalid Mpesa Number",
+                error_code: 400
             }
             throw new Error(response);
         }
@@ -33,21 +35,26 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
 
         const mpesa_api_response: MpesaApiResponseType = await requestMpesaPayment(BSshortcode, mpesaNumber, total_bill);
 
+        if (mpesa_api_response.error_message && mpesa_api_response.status === 'error') {
+            const payload: ConfirmDataProps = {
+                message: mpesa_api_response.error_message,
+                error_code: mpesa_api_response.error_code
+            }
+            return new NextResponse(JSON.stringify({ fail_message: payload }), { status: 200});
+        }
+
+
+        
+
         const payload: ConfirmDataProps = {
-            message: mpesa_api_response.resultData.ResultDesc,
-            receipt_no: mpesa_api_response.resultData.MerchantRequestID,
-            mpesa_refNo: mpesa_api_response.resultData.CallbackMetadata?.mpesaReceiptNumber
+            message: mpesa_api_response.resultData?.ResultDesc ?? "Transaction Successfull",
+            receipt_no: mpesa_api_response.resultData?.MerchantRequestID,
+            mpesa_refNo: mpesa_api_response?.resultData?.CallbackMetadata?.mpesaReceiptNumber
         }
         return new NextResponse(JSON.stringify({ success: payload }), { status: 201});
 
     } catch (error: any) {
-
-        console.log("Error at lipa endpoint: ", error);
-        if (error.status === "error") {
-            return new NextResponse(JSON.stringify({ fail_message: `${error.message}` }), { status: error.code });
-        } else {
-            return new NextResponse(JSON.stringify({ fail_message: "internal Server Error. Contact developer for technical support" }), { status: 500 });
-        }
+        return new NextResponse("Internal System Error!", { status : 500});
     }
         
     

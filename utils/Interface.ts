@@ -25,6 +25,7 @@ export interface FoodOrdered {
     message: string;
     mpesa_refNo?: string;
     receipt_no?: string;
+    error_code?: number;
   }
 
   export type OrderData = {
@@ -49,9 +50,9 @@ export interface FoodOrdered {
     ResultDesc: string,    
     ResultCode?: number,
     CallbackMetadata?: {
-        phoneNumber: string;
-        date: Date;
-        mpesaReceiptNumber: string;
-        amount: number;
+      phoneNumber: string;
+      transactionDate: Date;
+      mpesaReceiptNumber: string;
+      amount: number;
     }
   }

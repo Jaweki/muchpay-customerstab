@@ -51,7 +51,7 @@ const BackCard = ({
       };
       const response = await axios.post(url, payload);
 
-      const data = response.data;
+      const data = await response.data;
 
       console.log("Lipa na mpesa response: ", data);
       if (response.status === 201) {
@@ -65,18 +65,12 @@ const BackCard = ({
 
         const frontCardDiv = document.querySelector(`.${styles.card}`);
         frontCardDiv?.classList.toggle(`${styles.rotateFront}`);
-      } else if (response.status === 400) {
+      } else if (
+        data.fail_message.error_code === 400 ||
+        data.fail_message.error_code === 500
+      ) {
         setConfirmData({
-          message: data.fail_message,
-        });
-        setCardSide("back");
-        setCurrentStep(4);
-
-        const frontCardDiv = document.querySelector(`.${styles.card}`);
-        frontCardDiv?.classList.toggle(`${styles.rotateFront}`);
-      } else if (response.status === 500) {
-        setConfirmData({
-          message: data.fail_message,
+          message: data.fail_message.message,
         });
         setCardSide("back");
         setCurrentStep(4);
@@ -85,6 +79,7 @@ const BackCard = ({
         frontCardDiv?.classList.toggle(`${styles.rotateFront}`);
       }
     } catch (error) {
+      console.log("Incomming error: ", `${error}`);
       alert("System not Connected to internet!");
       window.location.assign("/");
     }
@@ -106,22 +101,19 @@ const BackCard = ({
   }, [confirmButton, handleSubmitNewOrder]);
 
   const validateContact = (contact: string) => {
-    if (contact.substring(0, 4) === "+254") {
+    if (contact.startsWith("+254")) {
       if (contact.substring(4).length === 9) {
         return true;
       } else {
         return false;
       }
-    } else if (contact.substring(0, 3) === "254") {
+    } else if (contact.startsWith("254")) {
       if (contact.substring(3).length === 9) {
         return true;
       } else {
         return false;
       }
-    } else if (
-      contact.substring(0, 2) === "07" ||
-      contact.substring(0, 2) === "01"
-    ) {
+    } else if (contact.startsWith("07") || contact.startsWith("01")) {
       if (contact.substring(2).length === 8) {
         return true;
       } else {

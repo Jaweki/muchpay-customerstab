@@ -83,13 +83,18 @@ export async function requestMpesaPayment(BSshortcode: number ,phoneNumber: stri
         const { MerchantRequestID, CheckoutRequestID} = await response.data as MpesaAcceptedPendingCallbackType;
 
         console.log({"M_ID": MerchantRequestID, "CH_ID":CheckoutRequestID });
-        const timeout = 40; // seconds
         const startTime = Date.now();
-        let matchedTransaction = {} as MPESA_CALLBACK_DOCS_STORE_TYPE;
-        while(Date.now() - startTime < timeout * 1000) {
-            if (await redis.exists(`${MerchantRequestID}-${CheckoutRequestID}`)) {
-                const data: any = await redis.get(`${MerchantRequestID}-${CheckoutRequestID}`)
-                matchedTransaction = JSON.parse(data);
+        const timeout = Date.now() - startTime < 40 * 1000;
+        let matchedTransaction = {} as any;
+        while(timeout) {
+            await redis.get(`${MerchantRequestID}-${CheckoutRequestID}`).then(
+                data => {
+                    if (data !== null) {
+                        matchedTransaction = data as MPESA_CALLBACK_DOCS_STORE_TYPE;
+                    }
+                }
+            )
+            if (Object.keys(matchedTransaction).length > 0) {
                 break;
             }
             await new Promise(resolve => setTimeout(resolve, 3000));
@@ -97,46 +102,66 @@ export async function requestMpesaPayment(BSshortcode: number ,phoneNumber: stri
 
         console.log("After transaction doc: ", matchedTransaction);
         
-        if (matchedTransaction.CallbackMetadata) {
+        if (matchedTransaction.CallbackMetadata && Object.keys(matchedTransaction.CallbackMetadata).length > 0) {
+            console.log("returning a success: ", matchedTransaction.CallbackMetadata );
+            const amount = matchedTransaction.CallbackMetadata.Item.map((obj: any) => { if (obj.Name === "Amount") return obj.Value  });
+            const mpesaReceiptNumber = matchedTransaction.CallbackMetadata.Item.map((obj: any) => { if (obj.Name === "MpesaReceiptNumber") return obj.Value  });
+            const phoneNumber = matchedTransaction.CallbackMetadata.Item.map((obj: any) => { if (obj.Name === "PhoneNumber") return obj.Value  });
+            const transactionDate = matchedTransaction.CallbackMetadata.Item.map((obj: any) => { if (obj.Name === "TransactionDate") return obj.Value  });
+
+
+            const payload = {...matchedTransaction, CallbackMetadata: {
+                amount, mpesaReceiptNumber, phoneNumber, transactionDate,
+            } } as MPESA_CALLBACK_DOCS_STORE_TYPE
+
             return {
                 status: 'success',
-                resultData: matchedTransaction,
+                resultData: payload,
             }
-        } else if (!matchedTransaction.CallbackMetadata) {
-            throw new Error(JSON.stringify({
+        } else if (Object.keys(matchedTransaction).find(key => key !== 'CallbackMetadata')) {
+            const response: any =  {
                 status: 'error',
-                messsage: matchedTransaction.ResultDesc,
-                code: 400,
-            }));
-        } else {
-            throw new Error("Internal system error!");
+                error_message: `${matchedTransaction.ResultDesc}`,
+                error_code: 400,
+            }
+            console.log("error response: ", response);
+            return response;
+        } else if (Object.keys(matchedTransaction).length <= 0) {
+            const response: any =  {
+                status: 'error',
+                error_message: "System timeout. If you have paid, report to the manager.",
+                error_code: 400,
+            }
+            console.log("error response: ", response);
+            return response;
         }
     } catch (error: any) {
-        // If error is from within mpesa API:
-        console.log("Error at requestMpesaPayment() axios post: ", error.response.data);
-        // Other kinds of errors:
-        console.log("Error message: ", error.message);
+        console.log("Caught Error: ", error.message);
 
         if (error.response) {
+            // If error is from within mpesa API:
+            console.log("Error at requestMpesaPayment() axios post: ", error.response.data);
             // If the error has a response property
             const error_message = error.response.data.errorMessage;
-
+            
             const response: any =  { 
                 status: 'error',
-                message: error_message,
-                code: 400
+                error_message,
+                error_code: 400
             }
-            throw new Error(response);
+            return response;
         } else if (retries > 0) {
+            console.log("Retring...");
+            // posiblly not connected to internet or network
             await new Promise(resolve => setTimeout(resolve, 10000));
             return requestMpesaPayment(BSshortcode, phoneNumber, amount, retries - 1);
         } else {
             const response: any =  { 
                 status: 'error',
-                message: error.message,
-                code: 400
+                error_message: "internal Server Error!",
+                error_code: 400
             }
-            throw new Error(response);
+            return response;
         }
     }
     
@@ -162,7 +187,7 @@ export async function mpesa_api_callback_endpoint(mpesa_api_callback: MPESA_CALL
         const closedTransacrionDoc: MPESA_CALLBACK_DOCS_STORE_TYPE = {
             MerchantRequestID: mpesa_api_callback.MerchantRequestID,
             CheckoutRequestID: mpesa_api_callback.CheckoutRequestID,
-            ResultDesc: "Mpesa cannot reach given mpesa pay number",
+            ResultDesc: "Mpesa cannot reach given mpesa-pay number",
         }
 
         const data_value = JSON.stringify(closedTransacrionDoc);
