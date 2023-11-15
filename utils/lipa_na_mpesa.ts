@@ -1,6 +1,6 @@
 import axios from "axios";
 import { MPESA_CALLBACK_DOCS_STORE_TYPE, MpesaAcceptedPendingCallbackType } from "./Interface";
-import { redis } from "./redis_config";
+// import { redis } from "./redis_config";
 
 export function editMpesaNumber(contact: string) {
     if (!contact) { 
@@ -88,11 +88,11 @@ export async function requestMpesaPayment(BSshortcode: number ,phoneNumber: stri
         const startTime = Date.now();
         let matchedTransaction = {} as MPESA_CALLBACK_DOCS_STORE_TYPE;
         while(Date.now() - startTime < timeout * 1000) {
-            if (await redis.exists(`${MerchantRequestID}-${CheckoutRequestID}`)) {
-                const data: any = await redis.get(`${MerchantRequestID}-${CheckoutRequestID}`)
-                matchedTransaction = JSON.parse(data);
-                break;
-            }
+            // if (await redis.exists(`${MerchantRequestID}-${CheckoutRequestID}`)) {
+            //     const data: any = await redis.get(`${MerchantRequestID}-${CheckoutRequestID}`)
+            //     matchedTransaction = JSON.parse(data);
+            //     break;
+            // }
             await new Promise(resolve => setTimeout(resolve, 3000));
         }
 
