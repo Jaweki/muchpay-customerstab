@@ -3,13 +3,12 @@ import { MPESA_CALLBACK_DOCS_STORE_TYPE, MpesaAcceptedPendingCallbackType } from
 // import { redis } from "./redis_config";
 
 export function editMpesaNumber(contact: string) {
-    if (!contact) { 
-        return null;
-    } else if (contact.substring(0, 4) === "+254") {
+    
+    if (contact.startsWith("+254")) {
         return contact.substring(1);
-    } else if (contact.substring(0, 3) === "254") {
+    } else if (contact.startsWith("254")) {
         return contact;
-    } else if (contact.substring(0, 2) === "07" || contact.substring(0, 2) === "01") {
+    } else if (contact.startsWith("07") || contact.startsWith("01")) {
         return "254" + contact.substring(1);
     } else {
         return null;
