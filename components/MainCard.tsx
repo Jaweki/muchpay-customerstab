@@ -69,7 +69,7 @@ const MainCard = () => {
       {cardSide === "back" && currentStep === 4 && (
         <NavButton
           additionalStyles={`-bottom-2 left-0 bg-yellow-400 ${styles.backButton}`}
-          textContent="Finish"
+          textContent="OK"
           cardSide={cardSide}
           role="OK"
           setCardSide={setCardSide}

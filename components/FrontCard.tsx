@@ -32,6 +32,12 @@ const FrontCard = ({
     frontButton.hidden = true;
   }, []);
 
+  function toggleNavButton(param: boolean) {
+    const frontButton = document.getElementById(
+      "navbutton-front"
+    ) as HTMLButtonElement;
+    frontButton && (frontButton.hidden = param);
+  }
   return (
     <div className={`${styles.frontCard} container`}>
       <div className="basis-1/4 flex flex-col">
@@ -42,8 +48,8 @@ const FrontCard = ({
           Today&apos;s Menu
         </h1>
 
-        <div className="m-2 border border-solid border-black h-16 w-24 bg-blue-950"></div>
-        <div className="m-2 border border-solid border-black h-16 w-24 bg-blue-950"></div>
+        <div className="m-2 border border-solid border-black h-[40%] w-24 bg-blue-950"></div>
+        <div className="m-2 border border-solid border-black h-[40%] w-24 bg-blue-950"></div>
       </div>
 
       <div id="foodMenu" className="basis-3/4 flex flex-col">
@@ -66,10 +72,7 @@ const FrontCard = ({
                   className="hover:cursor-pointer"
                   onChange={(e) => {
                     if (e.target.checked) {
-                      const frontButton = document.getElementById(
-                        "navbutton-front"
-                      ) as HTMLButtonElement;
-                      frontButton && (frontButton.hidden = false);
+                      toggleNavButton(false);
                       const qtyElement = document.getElementById(
                         `selection-${food.id}`
                       ) as HTMLSelectElement;
@@ -85,9 +88,12 @@ const FrontCard = ({
                       const remainingOrder = foodOrdered?.filter(
                         (order) => order.foodName !== food.name
                       );
-                      remainingOrder
-                        ? setFoodOrdered(remainingOrder)
-                        : setFoodOrdered(null);
+                      if (remainingOrder && remainingOrder?.length > 0) {
+                        setFoodOrdered(remainingOrder);
+                      } else {
+                        setFoodOrdered(null);
+                        toggleNavButton(true);
+                      }
                     }
                   }}
                 />
