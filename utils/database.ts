@@ -17,9 +17,9 @@ export const connectToDB = async (retries = 2): Promise<any> => {
         const options = {
             dbName: "dekut_meals",
         }
-        const connected = await mongoose.connect(uri, options);
-
-        if (connected.connection.readyState === 1) {
+        const connected = mongoose.createConnection(uri, options);
+        
+        if (connected.readyState === 1) {
             console.log("Connected to MongoDB");
             isConnected = true;
             return true;
@@ -41,6 +41,9 @@ export const writeDetailsOfCompleteOrderToDB = async (order: FoodOrdered[], cust
     console.log("Receipt No: ", receipt_no);
     console.log("customer Obj: ", customer);
     try {
+        const foodOrders = order.map(obj => {
+            return `${obj.qty}x ${obj.foodName}`
+        })
         const session = await mongoose.startSession();
         const isConnected = await connectToDB();
 
@@ -48,14 +51,11 @@ export const writeDetailsOfCompleteOrderToDB = async (order: FoodOrdered[], cust
             throw new Error("Failed to connect to db...");
         }
 
-        await session.startTransaction();
+        session.startTransaction();
 
         try {
-            const foodOrders = order.map(obj => {
-                return `${obj.qty}x ${obj.foodName}`
-            })
-
-            console.log("Starting transation writing...");
+            session.withTransaction(async () => {
+                console.log("Starting transation writing...");
             await CompleteOrder.create([{
                 date: new Date(),
                 posTerminal: "DKUT_MESS-POS1",
@@ -71,6 +71,9 @@ export const writeDetailsOfCompleteOrderToDB = async (order: FoodOrdered[], cust
                 phoneNumber: customer.phoneNumber,
             }], { session })
 
+            })
+
+            
             await session.commitTransaction();
             console.log("Done writing order in db sucessfully.");
         } catch (error) {
