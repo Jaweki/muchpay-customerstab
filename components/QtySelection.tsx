@@ -2,17 +2,16 @@ import { useCallback, useEffect, useState } from "react";
 
 const QtySelection = ({ foodId, price }: { foodId: string; price: number }) => {
   const [more, setMore] = useState<number | null>(null);
-
-  const priceSpanElement = document.getElementById(
-    `price-${foodId}`
-  ) as HTMLSpanElement;
+  const [priceSpanElement, setPriceSpanElement] =
+    useState<HTMLSpanElement | null>(null);
 
   const handleSelectionChange = useCallback(
     (event: Event) => {
       const { value } = event.target as HTMLSelectElement;
-      if (+value) {
+
+      if (+value && priceSpanElement) {
         priceSpanElement.textContent = `${price * parseInt(value)}`;
-      } else {
+      } else if (priceSpanElement && value == "more") {
         setMore(5);
         priceSpanElement.textContent = `${price * 5}`;
       }
@@ -33,6 +32,11 @@ const QtySelection = ({ foodId, price }: { foodId: string; price: number }) => {
     const selectElement = document.getElementById(`selection-${foodId}`);
     selectElement?.addEventListener("change", handleSelectionChange);
 
+    const spanElement = document.getElementById(
+      `price-${foodId}`
+    ) as HTMLSpanElement;
+
+    setPriceSpanElement(spanElement);
     return () => {
       selectElement?.removeEventListener("change", handleSelectionChange);
     };
@@ -61,7 +65,7 @@ const QtySelection = ({ foodId, price }: { foodId: string; price: number }) => {
           value={more}
           onChange={(e) => {
             const qty = +e.target.value;
-            if (qty > 0 && qty <= 15) {
+            if (qty > 0 && qty <= 15 && priceSpanElement) {
               setMore(qty);
               priceSpanElement.textContent = `${price * qty}`;
               const checkbox = document.getElementById(
