@@ -44,15 +44,17 @@ export interface FoodOrdered {
    CustomerMessage: string;
   }
 
+  export type CallbackMetadataType = {
+    phoneNumber: string;
+    transactionDate: number | string | Date;
+    mpesaReceiptNumber: string;
+    amount: number;
+  }
+
   export type MPESA_CALLBACK_DOCS_STORE_TYPE = {
     MerchantRequestID: string,          
     CheckoutRequestID: string,
     ResultDesc: string,    
     ResultCode?: number,
-    CallbackMetadata?: {
-      phoneNumber: string;
-      transactionDate: Date;
-      mpesaReceiptNumber: string;
-      amount: number;
-    }
+    CallbackMetadata?: CallbackMetadataType,
   }

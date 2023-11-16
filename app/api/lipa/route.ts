@@ -1,4 +1,5 @@
 import { ConfirmDataProps, MPESA_CALLBACK_DOCS_STORE_TYPE, OrderData } from "@/utils/Interface";
+import { writeDetailsOfCompleteOrderToDB } from "@/utils/database";
 import { editMpesaNumber, requestMpesaPayment} from "@/utils/lipa_na_mpesa";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -14,6 +15,7 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
 
     try {
         const {order, customer}: OrderData = await req.json();
+        console.log('Received order and customer data:', order, customer);
 
         let total_bill = 0;
         order.forEach((food) => {
@@ -43,18 +45,29 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
             return new NextResponse(JSON.stringify({ fail_message: payload }), { status: 200});
         }
 
+        if (!mpesa_api_response?.resultData?.CallbackMetadata) {
+            const payload: ConfirmDataProps = {
+                message: "System error",
+                error_code: 500,
+            }
+            return new NextResponse(JSON.stringify({ fail_message: payload }), { status: 200});
+        }
 
-        
+        const result = await writeDetailsOfCompleteOrderToDB(order, mpesa_api_response?.resultData?.CallbackMetadata, mpesa_api_response.resultData?.MerchantRequestID)
+
+        if (result !== true) {
+            throw new Error("Failed to write Order detailes to db.")
+        }
 
         const payload: ConfirmDataProps = {
-            message: mpesa_api_response.resultData?.ResultDesc ?? "Transaction Successfull",
+            message: mpesa_api_response.resultData?.ResultDesc ?? "Transaction Successful",
             receipt_no: mpesa_api_response.resultData?.MerchantRequestID,
             mpesa_refNo: mpesa_api_response?.resultData?.CallbackMetadata?.mpesaReceiptNumber
         }
         return new NextResponse(JSON.stringify({ success: payload }), { status: 201});
 
     } catch (error: any) {
-        return new NextResponse("Internal System Error!", { status : 500});
+        return new NextResponse(JSON.stringify({ error: "Internal System Error!" }), { status : 500});
     }
         
     

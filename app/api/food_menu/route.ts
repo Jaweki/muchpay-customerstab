@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { connectToDB } from "@/utils/connectToDB";
+import { connectToDB } from "@/utils/database";
 import MenuSchema from "@/models/MenuSchema";
 
 export const GET = async (req: NextRequest, res: NextResponse) => {

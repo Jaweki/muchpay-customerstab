@@ -99,16 +99,20 @@ export async function requestMpesaPayment(BSshortcode: number ,phoneNumber: stri
             }
             await new Promise(resolve => setTimeout(resolve, 3000));
         }
-
-        console.log("After transaction doc: ", matchedTransaction);
         
         if (matchedTransaction.CallbackMetadata && Object.keys(matchedTransaction.CallbackMetadata).length > 0) {
-            console.log("returning a success: ", matchedTransaction.CallbackMetadata );
-            const amount = matchedTransaction.CallbackMetadata.Item.map((obj: any) => { if (obj.Name === "Amount") return obj.Value  });
-            const mpesaReceiptNumber = matchedTransaction.CallbackMetadata.Item.map((obj: any) => { if (obj.Name === "MpesaReceiptNumber") return obj.Value  });
-            const phoneNumber = matchedTransaction.CallbackMetadata.Item.map((obj: any) => { if (obj.Name === "PhoneNumber") return obj.Value  });
-            const transactionDate = matchedTransaction.CallbackMetadata.Item.map((obj: any) => { if (obj.Name === "TransactionDate") return obj.Value  });
-
+            let amount;
+            let mpesaReceiptNumber;
+            let phoneNumber;
+            let transactionDate;
+            matchedTransaction.CallbackMetadata.Item.forEach(
+                (obj: any) => { 
+                    if (obj.Name === "Amount") { amount = obj.Value } 
+                    if (obj.Name === "MpesaReceiptNumber") { mpesaReceiptNumber = obj.Value }
+                    if (obj.Name === "PhoneNumber") { phoneNumber = obj.Value }
+                    if (obj.Name === "TransactionDate") { transactionDate = obj.Value }
+                }
+            );
 
             const payload = {...matchedTransaction, CallbackMetadata: {
                 amount, mpesaReceiptNumber, phoneNumber, transactionDate,
