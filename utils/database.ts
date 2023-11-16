@@ -17,9 +17,9 @@ export const connectToDB = async (retries = 2): Promise<any> => {
         const options = {
             dbName: "dekut_meals",
         }
-        const connected = mongoose.createConnection(uri, options);
-        
-        if (connected.readyState === 1) {
+        const connected = await mongoose.connect(uri, options);
+
+        if (connected.connection.readyState === 1) {
             console.log("Connected to MongoDB");
             isConnected = true;
             return true;
@@ -50,8 +50,6 @@ export const writeDetailsOfCompleteOrderToDB = async (order: FoodOrdered[], cust
         if (!isConnected) {
             throw new Error("Failed to connect to db...");
         }
-
-        session.startTransaction();
 
         try {
             session.withTransaction(async () => {
