@@ -52,9 +52,9 @@ export const writeDetailsOfCompleteOrderToDB = async (order: FoodOrdered[], cust
         }
 
         try {
-            session.withTransaction(async () => {
+            await session.withTransaction(async () => {
                 console.log("Starting transation writing...");
-            await CompleteOrder.create([{
+                await CompleteOrder.create([{
                 date: new Date(),
                 posTerminal: "DKUT_MESS-POS1",
                 orderReceipt: receipt_no,
