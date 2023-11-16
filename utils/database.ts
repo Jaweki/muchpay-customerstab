@@ -44,16 +44,16 @@ export const writeDetailsOfCompleteOrderToDB = async (order: FoodOrdered[], cust
         const foodOrders = order.map(obj => {
             return `${obj.qty}x ${obj.foodName}`
         })
-        const session = await mongoose.startSession();
         const isConnected = await connectToDB();
+        const session = await mongoose.startSession();
 
         if (!isConnected) {
             throw new Error("Failed to connect to db...");
         }
 
         try {
+            console.log("Starting transaction writing...");
             await session.withTransaction(async () => {
-                console.log("Starting transation writing...");
                 await CompleteOrder.create([{
                 date: new Date(),
                 posTerminal: "DKUT_MESS-POS1",
