@@ -48,13 +48,14 @@ export const writeDetailsOfCompleteOrderToDB = async (order: FoodOrdered[], cust
             throw new Error("Failed to connect to db...");
         }
 
-        session.startTransaction();
+        await session.startTransaction();
 
         try {
             const foodOrders = order.map(obj => {
                 return `${obj.qty}x ${obj.foodName}`
             })
 
+            console.log("Starting transation writing...");
             await CompleteOrder.create([{
                 date: new Date(),
                 posTerminal: "DKUT_MESS-POS1",
@@ -71,6 +72,7 @@ export const writeDetailsOfCompleteOrderToDB = async (order: FoodOrdered[], cust
             }], { session })
 
             await session.commitTransaction();
+            console.log("Done writing order in db sucessfully.");
         } catch (error) {
             await session.abortTransaction();
             throw error;
