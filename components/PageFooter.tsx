@@ -14,7 +14,7 @@ const PageFooter = () => {
           Privacy Policy
         </Link>{" "}
         |{" "}
-        <Link href="terms-and-condition" target="_blank" className="underline">
+        <Link href="terms-and-conditions" target="_blank" className="underline">
           Terms and conditions
         </Link>
       </div>
