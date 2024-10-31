@@ -7,7 +7,8 @@ import { writeDetailsOfCompleteOrderToDB } from "@/utils/database";
 import { editMpesaNumber, requestMpesaPayment } from "@/utils/lipa_na_mpesa";
 import { NextRequest, NextResponse } from "next/server";
 
-export const maxDuration = 120;
+// max duration limit is upto 60 in hobby plan of vercel.
+// export const maxDuration = 120;
 type MpesaApiResponseType = {
   status: string;
   resultData?: MPESA_CALLBACK_DOCS_STORE_TYPE;
