@@ -7,7 +7,7 @@ const page = () => {
         MUNCH PAY FOOD SERVICE
       </h1>
       <h1 className="text-4xl font-bold mb-4">Privacy Policy</h1>
-      <h2 className="text-sm mb-8">Last Updated: Thursday, 16 November 2023</h2>
+      <h2 className="text-sm mb-8">Last Updated: Thursday, 1 November 2024</h2>
       <h3 className="text-2xl font-semibold mb-4">
         Welcome to Jaweki Dev Group!
       </h3>
@@ -18,8 +18,10 @@ const page = () => {
       </p>
 
       <h2 className="text-2xl font-semibold mb-4">Information We Collect</h2>
-      <p className="text-base mb-8">
-        <h3 className="text-lg font-semibold mb-2">Customer Information:</h3>
+      <div className="text-base mb-8">
+        <span className="text-lg font-semibold mb-2">
+          Customer Information:
+        </span>
         <ul className="list-disc pl-4">
           <li>
             When you make a payment, we collect information such as your name,
@@ -28,7 +30,7 @@ const page = () => {
             aquired during an mpesa transaction.
           </li>
         </ul>
-        <h3 className="text-lg font-semibold mb-2">Profile Avatars:</h3>
+        <span className="text-lg font-semibold mb-2">Profile Avatars:</span>
         <ul className="list-disc pl-4">
           <li>
             If you choose to upload a profile avatar, it will be stored on AWS
@@ -36,19 +38,19 @@ const page = () => {
             kitchen.
           </li>
         </ul>
-        <h3 className="text-lg font-semibold mb-2">Usage Data:</h3>
+        <span className="text-lg font-semibold mb-2">Usage Data:</span>
         <ul className="list-disc pl-4">
           <li>
             We collect information on how you interact with our system, such as
             pages visited and features used.
           </li>
         </ul>
-      </p>
+      </div>
 
       <h2 className="text-2xl font-semibold mb-4">
         How We Use Your Information
       </h2>
-      <p className="text-base mb-8">
+      <div className="text-base mb-8">
         We use the information we collect for various purposes, including:
         <ul className="list-disc pl-4">
           <li>Processing your meal payments</li>
@@ -56,10 +58,10 @@ const page = () => {
           <li>Improving and optimizing our system</li>
           <li>Communicating with you about your orders and account</li>
         </ul>
-      </p>
+      </div>
 
       <h2 className="text-2xl font-semibold mb-4">Refund Policy</h2>
-      <p className="text-base mb-8">
+      <div className="text-base mb-8">
         Refund to customers are only initialized for the following
         circumstances:
         <ul className="list-disc pl-4">
@@ -86,7 +88,7 @@ const page = () => {
           NOTE! While claiming a refund, ensure you have the recipt to prove the
           order and/or an mpesa_message that confirms successful transaction .{" "}
         </span>
-      </p>
+      </div>
       <h2 className="text-2xl font-semibold mb-4">Data Security</h2>
       <p className="text-base mb-8">
         We take the security of your data seriously. We implement
@@ -105,14 +107,14 @@ const page = () => {
       </p>
 
       <h2 className="text-2xl font-semibold mb-4">Your Rights</h2>
-      <p className="text-base mb-8">
+      <div className="text-base mb-8">
         You have the right to:
         <ul className="list-disc pl-4">
           <li>Access the personal information we hold about you</li>
           <li>Correct inaccuracies in your personal information</li>
           <li>Request the deletion of your data</li>
         </ul>
-      </p>
+      </div>
 
       <h2 className="text-2xl font-semibold mb-4">
         Changes to This Privacy Policy
